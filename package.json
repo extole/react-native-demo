@@ -10,9 +10,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@extole/extole-mobile-sdk": "file:../../react-internal/extole-mobile-sdk",
+    "@extole/extole-mobile-sdk": "^0.1.0",
     "react": "18.1.0",
-    "react-native": "0.70.4"
+    "react-native": "0.70.4",
+    "react-native-webview": "^11.23.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

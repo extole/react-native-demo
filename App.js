@@ -1,14 +1,9 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
 import type {Node} from 'react';
+import React from 'react';
 import {
+  Button,
+  Dimensions,
+  Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -17,16 +12,12 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import replaceStr from '@extole/extole-mobile-sdk';
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors,} from 'react-native/Libraries/NewAppScreen';
 
-replaceStr('1', '1', '1');
+import {Extole} from '@extole/extole-mobile-sdk';
+
+const dimensions = Dimensions.get('window');
+const imageWidth = dimensions.width - 50;
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
@@ -56,13 +47,32 @@ const Section = ({children, title}): Node => {
   );
 };
 
+const extole = new Extole('mobile-monitor.extole.io', 'react-native');
+
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
-
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  // eslint-disable-next-line prettier/prettier
+  let [cta, setCta] = React.useState({});
+  React.useEffect(() => {
+    extole
+      .fetchZone('cta_prefetch')
+      .then((result: Record<string, any>) => {
+        setCta(result.zone.data);
+      })
+      .catch((error: Error) => {
+        console.log(
+          'There has been a problem with your fetch operation: ',
+          error,
+        );
+      });
+  }, []);
+  const onCtaButtonPress = () => {
+    extole.sendEvent(cta?.touch_event, {extole_zone_name: 'microsite'});
+  };
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -76,18 +86,34 @@ const App: () => Node = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
+          <Section title="Install npm dependencies">
+            npm install @extole/extole-mobile-sdk react-native-webview
           </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
+          <Section title="Instrument your app">
+            `extole.sendEvent('...', dataObject);`
           </Section>
-          <Section title="Debug">
-            <DebugInstructions />
+          <Section title="CTA Fetch">
+            <Text>
+              extole.fetchZone('cta_prefetch')
+              .then((result) => setCta(result.zone.data))
+            </Text>
           </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
+          <Section title="CTA Result">
+            <View>
+              <Image
+                style={styles.cta_image}
+                source={{
+                  uri: cta?.image || 'https://origin.xtlo.net/type=creativeArchive:clientId=1106500674:creativeArchiveId=7153594407382986000:version=2:coreAssetsVersion=67/images/generic-social.jpgr',
+                }}
+              />
+            </View>
+            <View style={styles.cta_image}>
+              <Button
+                style={styles.cta_image}
+                title={cta?.title || ''}
+                onPress={onCtaButtonPress}
+              />
+            </View>
           </Section>
         </View>
       </ScrollView>
@@ -111,6 +137,18 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  cta_image: {
+    width: imageWidth,
+    height: 100,
+    margin: 0,
+    padding: 0,
+  },
+  cta_button: {
+    alignSelf: 'stretch',
+  },
+  space: {
+    marginTop: 10,
   },
 });
 
