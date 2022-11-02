@@ -12,15 +12,15 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import {Colors,} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 import {Extole} from '@extole/extole-mobile-sdk';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 
 const dimensions = Dimensions.get('window');
 const imageWidth = dimensions.width - 50;
 
-/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
- * LTI update could not be added via codemod */
 const Section = ({children, title}): Node => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
@@ -48,15 +48,39 @@ const Section = ({children, title}): Node => {
 };
 
 const extole = new Extole('mobile-monitor.extole.io', 'react-native');
+const Stack = createStackNavigator();
 
-const App: () => Node = () => {
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen name="Promo" component={ExtoleScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+function ExtoleScreen() {
+  return extole.view;
+}
+
+function HomeScreen({navigation}: {navigation: any}) {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  // eslint-disable-next-line prettier/prettier
   let [cta, setCta] = React.useState({});
+  const [extoleView, setExtoleView] = React.useState(<View />);
+  extole.configureUIInteraction(extoleView, setExtoleView, () => {
+    console.log('navigate');
+    navigation.navigate('Promo');
+  });
   React.useEffect(() => {
     extole
       .fetchZone('cta_prefetch')
@@ -71,7 +95,10 @@ const App: () => Node = () => {
       });
   }, []);
   const onCtaButtonPress = () => {
-    extole.sendEvent(cta?.touch_event, {extole_zone_name: 'microsite'});
+    extole.sendEvent(cta?.touch_event, {});
+  };
+  const onWebViewActionPress = () => {
+    extole.sendEvent('promotion_link', {extole_zone_name: 'microsite'});
   };
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -94,24 +121,34 @@ const App: () => Node = () => {
           </Section>
           <Section title="CTA Fetch">
             <Text>
-              extole.fetchZone('cta_prefetch')
-              .then((result) => setCta(result.zone.data))
+              extole.fetchZone('cta_prefetch').then((result) =>
+              setCta(result.zone.data))
             </Text>
           </Section>
           <Section title="CTA Result">
             <View>
               <Image
+                id={'cta_image'}
                 style={styles.cta_image}
                 source={{
-                  uri: cta?.image || 'https://origin.xtlo.net/type=creativeArchive:clientId=1106500674:creativeArchiveId=7153594407382986000:version=2:coreAssetsVersion=67/images/generic-social.jpgr',
+                  uri:
+                    cta?.image ||
+                    'https://www.extole.com/wp-content/uploads/2022/10/header-logo.svg',
                 }}
               />
             </View>
             <View style={styles.cta_image}>
               <Button
-                style={styles.cta_image}
+                id={'cta_button'}
+                style={styles.cta_button}
                 title={cta?.title || ''}
                 onPress={onCtaButtonPress}
+              />
+              <Button
+                id={'cta_web_view'}
+                style={styles.cta_button}
+                title={'WebView Example'}
+                onPress={onWebViewActionPress}
               />
             </View>
           </Section>
@@ -119,7 +156,7 @@ const App: () => Node = () => {
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   sectionContainer: {
@@ -145,11 +182,12 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   cta_button: {
-    alignSelf: 'stretch',
+    width: imageWidth,
+    height: 100,
+    margin: 0,
+    padding: 0,
   },
   space: {
     marginTop: 10,
   },
 });
-
-export default App;
