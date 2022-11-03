@@ -140,14 +140,16 @@ function HomeScreen({navigation}: {navigation: any}) {
             <View style={styles.cta_image}>
               <Button
                 id={'cta_button'}
+                uppercase={false}
                 style={styles.cta_button}
-                title={cta?.title || ''}
+                title={cta?.title?.toUpperCase() || ''}
                 onPress={onCtaButtonPress}
               />
               <Button
                 id={'cta_web_view'}
+                uppercase={false}
                 style={styles.cta_button}
-                title={'WebView Example'}
+                title={'WebView Example'.toUpperCase()}
                 onPress={onWebViewActionPress}
               />
             </View>
@@ -186,6 +188,7 @@ const styles = StyleSheet.create({
     height: 100,
     margin: 0,
     padding: 0,
+    textTransform: 'lowercase',
   },
   space: {
     marginTop: 10,
