@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
-import {Extole} from '@extole/extole-mobile-sdk';
+import {Extole} from '@extole/react-native-sdk';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
