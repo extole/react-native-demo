@@ -2,6 +2,9 @@ module.exports = {
   root: true,
   extends: '@react-native-community',
   plugins: ['detox'],
+  globals: {
+    $: true,
+  },
   overrides: [
     {
       files: ['*.e2e.js'],

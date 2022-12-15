@@ -75,17 +75,17 @@ function HomeScreen({navigation}: {navigation: any}) {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  let [cta, setCta] = React.useState({});
+  let [zone, setZone] = React.useState({});
   const [extoleView, setExtoleView] = React.useState(<View />);
-  extole.configureUIInteraction(extoleView, setExtoleView, () => {
+  extole.configure(extoleView, setExtoleView, () => {
     console.log('navigate');
     navigation.navigate('Promo');
   });
   React.useEffect(() => {
     extole
-      .fetchZone('cta_prefetch')
+      .fetchZone('mobile_cta')
       .then((result: Record<string, any>) => {
-        setCta(result.zone.data);
+        setZone(result.zone);
       })
       .catch((error: Error) => {
         console.log(
@@ -95,10 +95,10 @@ function HomeScreen({navigation}: {navigation: any}) {
       });
   }, []);
   const onCtaButtonPress = () => {
-    extole.sendEvent(cta?.touch_event, {});
+    extole.sendEvent('mobile_cta_tap', {}); // TODO change it to zone.tap()
   };
   const onWebViewActionPress = () => {
-    extole.sendEvent('promotion_link', {extole_zone_name: 'microsite'});
+    extole.sendEvent('deeplink', {extole_zone_name: 'microsite'});
   };
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -132,21 +132,21 @@ function HomeScreen({navigation}: {navigation: any}) {
                 style={styles.cta_image}
                 source={{
                   uri:
-                    cta?.image ||
+                    zone?.data?.image ||
                     'https://www.extole.com/wp-content/uploads/2022/10/header-logo.svg',
                 }}
               />
             </View>
             <View style={styles.cta_image}>
               <Button
-                id={'cta_button'}
+                accessibilityLabel="cta-button"
                 uppercase={false}
                 style={styles.cta_button}
-                title={cta?.title?.toUpperCase() || ''}
+                title={zone?.data?.title?.toUpperCase() || ''}
                 onPress={onCtaButtonPress}
               />
               <Button
-                id={'cta_web_view'}
+                accessibilityLabel="cta-web-view-button"
                 uppercase={false}
                 style={styles.cta_button}
                 title={'WebView Example'.toUpperCase()}
