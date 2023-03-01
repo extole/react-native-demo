@@ -14,9 +14,11 @@ beforeAll(async () => {
   await driver.sleep(20000);
 });
 
-test('my first appium test', async () => {
+test('on CTA ITEM Click, Native Share Action is executed', async () => {
   expect(await driver.hasElementByAccessibilityId('cta-button')).toBe(true);
   const element = await driver.elementByAccessibilityId('cta-button');
-  await element.click();
-  expect(await driver.hasElementByAccessibilityId('notHere')).toBe(false);
+  await element.click().perform();
+  expect(await driver.elements('text', 'generic-social.jpg')).toBe(
+    true,
+  );
 });

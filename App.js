@@ -59,7 +59,7 @@ export default function App() {
           component={HomeScreen}
           options={{headerShown: false}}
         />
-        <Stack.Screen name="Promo" component={ExtoleScreen} />
+        <Stack.Screen name="Promo" component={ExtoleScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -69,14 +69,14 @@ function ExtoleScreen() {
   return extole.view;
 }
 
-function HomeScreen({navigation}: {navigation: any}) {
+function HomeScreen({navigation}: { navigation: any }) {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   let [zone, setZone] = React.useState({});
-  const [extoleView, setExtoleView] = React.useState(<View />);
+  const [extoleView, setExtoleView] = React.useState(<View/>);
   extole.configure(extoleView, setExtoleView, () => {
     console.log('navigate');
     navigation.navigate('Promo');
@@ -84,8 +84,8 @@ function HomeScreen({navigation}: {navigation: any}) {
   React.useEffect(() => {
     extole
       .fetchZone('mobile_cta')
-      .then((result: Record<string, any>) => {
-        setZone(result.zone);
+      .then(([zone, _campaign]) => {
+        setZone(zone);
       })
       .catch((error: Error) => {
         console.log(
