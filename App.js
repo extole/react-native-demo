@@ -95,7 +95,7 @@ function HomeScreen({navigation}: { navigation: any }) {
       });
   }, []);
   const onCtaButtonPress = () => {
-    extole.sendEvent('mobile_cta_tap', {}); // TODO change it to zone.tap()
+    zone.tap();
   };
   const onWebViewActionPress = () => {
     extole.sendEvent('deeplink', {extole_zone_name: 'microsite'});
